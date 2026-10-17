@@ -2,14 +2,14 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ShelfService } from './shelf.service';
 import { AddToShelfDTO } from './dto/add-to-shelf.dto';
 import { query } from 'axios';
-import { ListShelfDto } from './dto/list-shelf.dto';
+import { ListShelfDTO } from './dto/list-shelf.dto';
 
 @Controller('shelf')
 export class ShelfController {
   constructor(private readonly shelf: ShelfService) {}
 
   @Get()
-  list(@Query() query: ListShelfDto) {
+  list(@Query() query: ListShelfDTO) {
     return this.shelf.list(query.status);
   }
 

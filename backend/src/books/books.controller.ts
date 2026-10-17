@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { OpenLibraryService } from "../open-library/open-library.service";
 import { SearchBooksDTO } from "./dto/search-books.dto";
-import { WorkIdParamDto } from "./dto/work-id-param.dto";
+import { WorkIdParamDTO } from "./dto/work-id-param.dto";
 
 @Controller('books')
 export class BooksController {
@@ -13,7 +13,7 @@ export class BooksController {
     }
 
     @Get(':workId')
-    getOne(@Param() params: WorkIdParamDto) {
+    getOne(@Param() params: WorkIdParamDTO) {
         return this.openLibrary.getBook(params.workId);
     }
 }

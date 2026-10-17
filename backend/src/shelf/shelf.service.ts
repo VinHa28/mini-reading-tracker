@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ReadingStatus, ShelfBook } from './shelf-book.entity';
 import { QueryFailedError, Repository } from 'typeorm';
@@ -72,5 +76,11 @@ export class ShelfService {
 
     const total = Object.values(counts).reduce((a, b) => a + b, 0);
     return { ...counts, total };
+  }
+
+  async findById(id: number): Promise<ShelfBook> {
+    const book = await this.repo.findOneBy({ id });
+    if (!book) throw new NotFoundException('Không tìm thấy sách trong tủ.');
+    return book;
   }
 }

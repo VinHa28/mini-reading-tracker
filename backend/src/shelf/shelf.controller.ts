@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ShelfService } from './shelf.service';
 import { AddToShelfDTO } from './dto/add-to-shelf.dto';
-import { query } from 'axios';
 import { ListShelfDTO } from './dto/list-shelf.dto';
+import { ShelfBookIdParamDTO } from './dto/shelf-book-id-param.dto';
 
 @Controller('shelf')
 export class ShelfController {
@@ -16,6 +16,11 @@ export class ShelfController {
   @Get('stats')
   stats() {
     return this.shelf.stats();
+  }
+
+  @Get(':shelfBookId')
+  getById(@Param() params: ShelfBookIdParamDTO) {
+    return this.shelf.findById(params.shelfBookId);
   }
 
   @Post()

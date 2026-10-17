@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ShelfService } from './shelf.service';
 import { AddToShelfDTO } from './dto/add-to-shelf.dto';
 import { ListShelfDTO } from './dto/list-shelf.dto';
 import { ShelfBookIdParamDTO } from './dto/shelf-book-id-param.dto';
+import { UpdateShelfDTO } from './dto/update-shelf.dto';
 
 @Controller('shelf')
 export class ShelfController {
@@ -21,6 +30,14 @@ export class ShelfController {
   @Get(':shelfBookId')
   getById(@Param() params: ShelfBookIdParamDTO) {
     return this.shelf.findById(params.shelfBookId);
+  }
+
+  @Patch(':shelfBookId')
+  updateById(
+    @Param() params: ShelfBookIdParamDTO,
+    @Body() dto: UpdateShelfDTO,
+  ) {
+    return this.shelf.updateProgress(params.shelfBookId, dto);
   }
 
   @Post()

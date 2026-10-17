@@ -8,6 +8,8 @@ import { ReadingStatus, ShelfBook } from './shelf-book.entity';
 import { QueryFailedError, Repository } from 'typeorm';
 import { OpenLibraryService } from '../open-library/open-library.service';
 import { AddToShelfDTO } from './dto/add-to-shelf.dto';
+import { UpdateShelfDTO } from './dto/update-shelf.dto';
+import { applyUpdate } from './shelf-rules';
 
 @Injectable()
 export class ShelfService {
@@ -82,5 +84,11 @@ export class ShelfService {
     const book = await this.repo.findOneBy({ id });
     if (!book) throw new NotFoundException('Không tìm thấy sách trong tủ.');
     return book;
+  }
+
+  async update(id: number, dto: UpdateShelfDTO): Promise<ShelfBook> {
+    const book = await this.findById(id);
+    applyUpdate(book, dto, new Date());
+    return this.repo.save(book);
   }
 }

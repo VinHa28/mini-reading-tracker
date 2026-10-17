@@ -37,7 +37,7 @@ export class ShelfController {
     @Param() params: ShelfBookIdParamDTO,
     @Body() dto: UpdateShelfDTO,
   ) {
-    return this.shelf.updateProgress(params.shelfBookId, dto);
+    return this.shelf.update(params.shelfBookId, dto);
   }
 
   @Post()

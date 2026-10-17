@@ -38,7 +38,7 @@ export class ShelfService {
             return await this.repo.save(entity);
         } catch (error) {
             if (error instanceof QueryFailedError && (error.driverError as {code?:string}).code === "ER_DUP_ENTRY") {
-                throw new ConflictException("Sách này đã có trong túi");
+                throw new ConflictException("Sách này đã có trong tủ");
             }
             throw error;
         }

@@ -1,0 +1,85 @@
+:root {
+  /* Màu */
+  --color-bg: #f7f3ea;
+  --color-surface: #ffffff;
+  --color-surface-muted: #fbf9f4;
+  --color-border: #e5ddcb;
+  --color-border-strong: #cfc5ae;
+  --color-text: #231f1a;
+  --color-text-muted: #655d51;
+  --color-accent: #2f5d50;
+  --color-accent-hover: #244a40;
+  --color-accent-soft: #e2ede7;
+  --color-want-bg: #e5ebf6;
+  --color-want-fg: #33507f;
+  --color-reading-bg: #fbeacb;
+  --color-reading-fg: #7a4a00;
+  --color-done-bg: #dceee3;
+  --color-done-fg: #1f5240;
+  --color-danger: #b3261e;
+  --color-danger-hover: #8f1d17;
+  --color-danger-soft: #fbe7e4;
+  --color-star: #b7791f;
+  --color-star-empty: #9c917b;
+  --color-overlay: rgba(35, 31, 26, 0.45);
+
+  /* Chữ */
+  --font-sans: "Be Vietnam Pro", system-ui, sans-serif;
+  --font-serif: "Lora", Georgia, serif;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 15px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 36px;
+
+  /* Khoảng cách */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Bo góc & bóng */
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-pill: 999px;
+  --shadow-sm:
+    0 1px 2px rgba(35, 31, 26, 0.06), 0 2px 8px rgba(35, 31, 26, 0.04);
+  --shadow-md: 0 6px 20px rgba(35, 31, 26, 0.1);
+  --shadow-lg: 0 16px 48px rgba(35, 31, 26, 0.2);
+
+  /* Bố cục (1 breakpoint duy nhất: < 720px là mobile) */
+  --container: 1080px;
+  --nav-height: 64px;
+  --tap-target: 44px;
+}
+
+/* Reset */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ReadingStatus, ShelfBook } from './shelf-book.entity';
-import { QueryFailedError, Repository } from 'typeorm';
+import { In, QueryFailedError, Repository } from 'typeorm';
 import { OpenLibraryService } from '../open-library/open-library.service';
 import { AddToShelfDTO } from './dto/add-to-shelf.dto';
 import { UpdateShelfDTO } from './dto/update-shelf.dto';
@@ -97,5 +97,14 @@ export class ShelfService {
     if (result.affected === 0) {
       throw new NotFoundException('Không tìm thấy sách trong tủ.');
     }
+  }
+
+  async findShelfIdsByWorkIds(workIds: string[]): Promise<Map<string, number>> {
+    if (workIds.length === 0) return new Map();
+    const rows = await this.repo.find({
+      select: { id: true, workId: true },
+      where: { workId: In(workIds) },
+    });
+    return new Map(rows.map((r) => [r.workId, r.id]));
   }
 }

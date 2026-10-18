@@ -21,7 +21,7 @@
 
 ## Tính năng
 
-- Tìm sách theo tên hoặc tác giả, phân trang, hiện sẵn gợi ý khi mở trang. Sách đã có trong tủ được đánh dấu "Đã thêm".
+- Tìm sách theo tên hoặc tác giả, phân trang. Sách đã có trong tủ được đánh dấu "Đã thêm".
 - Trang chi tiết: mô tả, chủ đề, năm xuất bản, số trang.
 - Thêm vào tủ, thêm trùng thì báo "đã có trong tủ" (API trả `409`).
 - Tủ sách có thống kê, lọc theo trạng thái (Muốn đọc / Đang đọc / Đã đọc xong), cập nhật trang đang đọc, đổi trạng thái, chấm sao 1 đến 5, ghi chú tối đa 500 ký tự, xóa khỏi tủ (có hộp xác nhận).
@@ -219,11 +219,8 @@ Các luật này nằm trong hàm thuần `backend/src/shelf/shelf-rules.ts` và
 - Chưa có CI/CD, deploy bằng tay qua SSH.
 
 **Hướng cải thiện**
-- Cache kết quả tìm kiếm (bộ nhớ hoặc Redis) và rate limit bằng `@nestjs/throttler`.
-- Thêm xác thực nhiều người dùng, mỗi người một tủ sách riêng.
-- Test e2e (Playwright) và test component (Vitest) cho frontend.
-- CI chạy lint, test, build ảnh Docker; tự động deploy khi merge vào `main`.
-- Sao lưu định kỳ volume MySQL.
+- Cache kết quả tìm kiếm (bộ nhớ hoặc Redis) và rate limit bằng `@nestjs/throttler`. (ở mức nghiên cứu)
+- Test e2e (Playwright) và test component (Vitest) cho frontend. (ở mức nghiên cứu thêm)
 
 ## Kiểm thử
 

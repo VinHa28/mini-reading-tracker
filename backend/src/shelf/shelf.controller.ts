@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -38,6 +40,12 @@ export class ShelfController {
     @Body() dto: UpdateShelfDTO,
   ) {
     return this.shelf.update(params.shelfBookId, dto);
+  }
+
+  @Delete(':shelfBookId')
+  @HttpCode(204)
+  remove(@Param() params: ShelfBookIdParamDTO) {
+    return this.shelf.remove(params.shelfBookId);
   }
 
   @Post()

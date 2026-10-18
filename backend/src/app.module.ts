@@ -22,6 +22,10 @@ import { ShelfModule } from './shelf/shelf.module';
         timezone: 'Z',
         autoLoadEntities: true,
         synchronize: false,
+        logging:
+          config.get<string>('DB_LOGGING') === 'true'
+            ? ['query', 'error']
+            : ['error'],
       }),
     }),
     BookModule,

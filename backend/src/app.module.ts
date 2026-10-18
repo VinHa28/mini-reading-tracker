@@ -25,7 +25,7 @@ import { ShelfModule } from './shelf/shelf.module';
       }),
     }),
     BookModule,
-    ShelfModule
+    ShelfModule,
   ],
   controllers: [AppController],
   providers: [AppService],

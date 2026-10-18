@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, Index, UpdateDateColumn, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  UpdateDateColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 export enum ReadingStatus {
   WANT_TO_READ = 'WANT_TO_READ',
@@ -47,10 +54,20 @@ export class ShelfBook {
   @Column({ type: 'varchar', length: 500, nullable: true })
   note: string | null;
 
-  @Column({ name: 'started_at', type: 'datetime', precision: 3, nullable: true })
+  @Column({
+    name: 'started_at',
+    type: 'datetime',
+    precision: 3,
+    nullable: true,
+  })
   startedAt: Date | null;
 
-  @Column({ name: 'finished_at', type: 'datetime', precision: 3, nullable: true })
+  @Column({
+    name: 'finished_at',
+    type: 'datetime',
+    precision: 3,
+    nullable: true,
+  })
   finishedAt: Date | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'datetime', precision: 6 })

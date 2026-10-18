@@ -6,6 +6,9 @@ import { ApiError } from "@/api/client";
 import ShelfItem from "@/components/ShelfItem.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import type { ReadingStatus, ShelfBook, UpdateShelfPayload } from "@/types/api";
+import { useToastStore } from "@/stores/toast";
+
+const toast = useToastStore();
 
 type Tab = "ALL" | ReadingStatus;
 
@@ -36,7 +39,7 @@ const visibleItems = computed(() =>
 );
 
 // Update 
-const itemErrors = reactive<Record<number, string | null>>({});
+// const itemErrors = reactive<Record<number, string | null>>({});
 const finishedBanner = reactive<Record<number, boolean>>({});
 
 // Thông báo ở cấp trang: thẻ sách có thể bị lọc khỏi tab hiện tại
@@ -52,7 +55,6 @@ function showNotice(message: string) {
 }
 
 async function patch(book: ShelfBook, payload: UpdateShelfPayload) {
-  itemErrors[book.id] = null;
   try {
     const updated = await store.update(book.id, payload);
     // Server tự chuyển sang FINISHED khi đọc đến trang cuối
@@ -64,28 +66,30 @@ async function patch(book: ShelfBook, payload: UpdateShelfPayload) {
     if (autoFinished && activeTab.value !== "ALL" && activeTab.value !== "FINISHED") {
       showNotice(`Bạn vừa đọc đến trang cuối “${updated.title}”. Sách đã tự chuyển sang “Đã đọc xong”.`);
     }
+    return true;
   } catch (e) {
-    itemErrors[book.id] = e instanceof ApiError ? e.message : "Không cập nhật được";
+    toast.error("Không cập nhật được", e instanceof ApiError ? e.message : undefined);
+    return false;
   }
 }
 
 // Delete có popub
 const toDelete = ref<ShelfBook | null>(null);
 const deleting = ref(false);
-const deleteError = ref<string | null>(null);
+// const deleteError = ref<string | null>(null);
 
 async function confirmDelete() {
   if (!toDelete.value) return;
+  const book = toDelete.value;
   deleting.value = true;
-  deleteError.value = null;
   try {
-    await store.remove(toDelete.value.id);
-    toDelete.value = null;
+    await store.remove(book.id);
+    toast.success("Đã xóa khỏi tủ sách", book.title);
   } catch (e) {
-    deleteError.value = e instanceof ApiError ? e.message : "Không xóa được sách";
-    toDelete.value = null;
+    toast.error("Không xóa được sách", e instanceof ApiError ? e.message : undefined);
   } finally {
     deleting.value = false;
+    toDelete.value = null;
   }
 }
 
@@ -103,9 +107,10 @@ async function confirmStatusChange() {
   if (!pendingStatus.value) return;
   const { book, status } = pendingStatus.value;
   changingStatus.value = true;
-  await patch(book, { status }); 
+  const ok = await patch(book, { status });
   changingStatus.value = false;
   pendingStatus.value = null;
+  if (ok) toast.success("Đã đổi trạng thái", `${book.title} → ${STATUS_LABELS[status]}`);
 }
 
 onMounted(() => store.fetchAll());
@@ -144,7 +149,10 @@ onMounted(() => store.fetchAll());
 
       <div v-if="notice" class="notice" role="status">
         <span class="notice__icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m5 12.5 4.5 4.5L19 7.5" />
+          </svg>
         </span>
         <span class="notice__text">{{ notice }}</span>
         <button type="button" class="notice__link" @click="activeTab = 'FINISHED'; notice = null">
@@ -153,13 +161,12 @@ onMounted(() => store.fetchAll());
         <button type="button" class="notice__close" aria-label="Đóng thông báo" @click="notice = null">×</button>
       </div>
 
-      <p v-if="deleteError" class="msg msg--error">{{ deleteError }}</p>
+      <!-- <p v-if="deleteError" class="msg msg--error">{{ deleteError }}</p> -->
 
       <div v-if="visibleItems.length" class="list">
         <ShelfItem v-for="b in visibleItems" :key="b.id" :entry="b" :show-finished-banner="finishedBanner[b.id]"
-          :server-error="itemErrors[b.id]" @update-page="patch(b, { currentPage: $event })"
-          @change-status="pendingStatus = { book: b, status: $event }" @rate="patch(b, { rating: $event })"
-          @save-note="patch(b, { note: $event })" @remove="toDelete = b" />
+          @update-page="patch(b, { currentPage: $event })" @change-status="pendingStatus = { book: b, status: $event }"
+          @rate="patch(b, { rating: $event })" @save-note="patch(b, { note: $event })" @remove="toDelete = b" />
       </div>
 
       <div v-else class="empty">
@@ -315,6 +322,7 @@ onMounted(() => store.fetchAll());
   font-size: var(--text-sm);
   font-weight: 500;
 }
+
 .notice__icon {
   flex: none;
   width: 28px;
@@ -326,7 +334,12 @@ onMounted(() => store.fetchAll());
   align-items: center;
   justify-content: center;
 }
-.notice__text { flex: 1; min-width: 0; }
+
+.notice__text {
+  flex: 1;
+  min-width: 0;
+}
+
 .notice__link {
   flex: none;
   min-height: var(--tap-target);
@@ -338,6 +351,7 @@ onMounted(() => store.fetchAll());
   text-decoration: underline;
   cursor: pointer;
 }
+
 .notice__close {
   flex: none;
   width: var(--tap-target);
@@ -396,9 +410,11 @@ onMounted(() => store.fetchAll());
   .tab {
     flex: none;
   }
+
   .notice {
     flex-wrap: wrap;
   }
+
   .notice__text {
     flex: 1 1 calc(100% - 100px);
   }

@@ -57,7 +57,14 @@ services:
       BACKEND_HOST: backend
       BACKEND_PORT: 3000
     ports:
-      - "${WEB_PORT:-8080}:80"
+      - "127.0.0.1:${WEB_PORT:-8080}:80"
+    networks:
+      - default
+      - proxy
       
 volumes:
   mysql_data:
+
+networks:
+  proxy:
+    name: proxy

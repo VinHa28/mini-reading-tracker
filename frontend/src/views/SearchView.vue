@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { searchBooks } from "@/api/books";
 import { addToShelf } from "@/api/shelf";
@@ -10,7 +10,12 @@ import type { BookSummary } from "@/types/api";
 
 const router = useRouter();
 
-const query = ref("");
+// Từ khóa dùng để gợi ý sách khi mới vào trang (ô tìm vẫn để trống)
+const SUGGESTED_QUERY = "fantasy";
+
+const query = ref(""); // nội dung người dùng đang gõ trong ô tìm
+const activeQuery = ref(""); // từ khóa đã dùng để tìm (dùng cho phân trang, thử lại)
+const isSuggestion = ref(false);
 const page = ref(1);
 const items = ref<BookSummary[]>([]);
 const total = ref(0);
@@ -27,12 +32,10 @@ const addError = ref<string | null>(null);
 const pageCount = computed(() => Math.ceil(total.value / pageSize.value));
 
 async function runSearch(p = 1) {
-  const q = query.value.trim();
-  if (!q) return;
   loading.value = true;
   error.value = null;
   try {
-    const res = await searchBooks(q, p);
+    const res = await searchBooks(activeQuery.value, p);
     items.value = res.items;
     total.value = res.total;
     page.value = res.page;
@@ -45,6 +48,21 @@ async function runSearch(p = 1) {
     loading.value = false;
   }
 }
+
+function submitSearch() {
+  const q = query.value.trim();
+  if (!q) return;
+  activeQuery.value = q;
+  isSuggestion.value = false;
+  runSearch(1);
+}
+
+// Lần đầu vào trang: hiện sẵn sách gợi ý, không điền chữ vào ô tìm
+onMounted(() => {
+  activeQuery.value = SUGGESTED_QUERY;
+  isSuggestion.value = true;
+  runSearch(1);
+});
 
 function addStateOf(b: BookSummary): "idle" | "adding" | "added" {
   if (b.inShelf) return "added";
@@ -75,8 +93,8 @@ function openBook(b: BookSummary) {
 <template>
   <h1>Tìm sách</h1>
 
-  <form class="search" @submit.prevent="runSearch(1)">
-    <input v-model="query" type="text" placeholder="Nhập tên sách hoặc tác giả" />
+  <form class="search" @submit.prevent="submitSearch">
+    <input v-model="query" name="q" type="text" placeholder="Nhập tên sách hoặc tác giả" />
     <button type="submit" :disabled="loading">Tìm</button>
   </form>
 
@@ -88,10 +106,12 @@ function openBook(b: BookSummary) {
     <button type="button" @click="runSearch(page)">Thử lại</button>
   </div>
   <p v-else-if="searched && items.length === 0" class="msg">
-    Không có kết quả cho "{{ query }}". Thử từ khóa khác nhé.
+    Không có kết quả cho "{{ activeQuery }}". Thử từ khóa khác nhé.
   </p>
   <template v-else-if="items.length">
-    <p class="msg">Tìm thấy {{ total }} kết quả</p>
+    <p class="msg">
+      {{ isSuggestion ? "Gợi ý cho bạn" : `Tìm thấy ${total} kết quả` }}
+    </p>
     <div class="grid">
       <BookCard v-for="b in items" :key="b.workId" :book="b" :add-state="addStateOf(b)" @add="handleAdd(b)"
         @open="openBook(b)" />

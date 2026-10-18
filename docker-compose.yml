@@ -23,5 +23,41 @@ services:
       timeout: 5s
       retries: 20
 
+  backend:
+    build: ./backend
+    container_name: reading-tracker-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      DB_HOST: mysql # tên service
+      DB_PORT: 3306 # cổng nội bộ trong mạng Docker
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_LOGGING: "false"
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/shelf/stats >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  frontend:
+    build: ./frontend
+    container_name: reading-tracker-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      BACKEND_HOST: backend
+      BACKEND_PORT: 3000
+    ports:
+      - "${WEB_PORT:-8080}:80"
+      
 volumes:
   mysql_data:

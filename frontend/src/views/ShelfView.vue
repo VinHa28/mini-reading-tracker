@@ -39,15 +39,31 @@ const visibleItems = computed(() =>
 const itemErrors = reactive<Record<number, string | null>>({});
 const finishedBanner = reactive<Record<number, boolean>>({});
 
+// Thông báo ở cấp trang: thẻ sách có thể bị lọc khỏi tab hiện tại
+// (vd đang ở tab "Đang đọc" mà sách tự chuyển sang "Đã đọc xong"),
+// nên thông báo trong thẻ sẽ biến mất cùng thẻ.
+const notice = ref<string | null>(null);
+let noticeTimer: ReturnType<typeof setTimeout> | undefined;
+
+function showNotice(message: string) {
+  notice.value = message;
+  clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => (notice.value = null), 8000);
+}
+
 async function patch(book: ShelfBook, payload: UpdateShelfPayload) {
   itemErrors[book.id] = null;
   try {
     const updated = await store.update(book.id, payload);
     // Server tự chuyển sang FINISHED khi đọc đến trang cuối
-    finishedBanner[book.id] =
+    const autoFinished =
       book.status !== "FINISHED" &&
       updated.status === "FINISHED" &&
       payload.status === undefined;
+    finishedBanner[book.id] = autoFinished;
+    if (autoFinished && activeTab.value !== "ALL" && activeTab.value !== "FINISHED") {
+      showNotice(`Bạn vừa đọc đến trang cuối “${updated.title}”. Sách đã tự chuyển sang “Đã đọc xong”.`);
+    }
   } catch (e) {
     itemErrors[book.id] = e instanceof ApiError ? e.message : "Không cập nhật được";
   }
@@ -124,6 +140,17 @@ onMounted(() => store.fetchAll());
           {{ t.label }}
           <span class="tab__count">{{ t.count }}</span>
         </button>
+      </div>
+
+      <div v-if="notice" class="notice" role="status">
+        <span class="notice__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+        </span>
+        <span class="notice__text">{{ notice }}</span>
+        <button type="button" class="notice__link" @click="activeTab = 'FINISHED'; notice = null">
+          Xem mục “Đã đọc xong”
+        </button>
+        <button type="button" class="notice__close" aria-label="Đóng thông báo" @click="notice = null">×</button>
       </div>
 
       <p v-if="deleteError" class="msg msg--error">{{ deleteError }}</p>
@@ -277,6 +304,52 @@ onMounted(() => store.fetchAll());
   color: #fff;
 }
 
+.notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--color-done-bg);
+  color: var(--color-done-fg);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.notice__icon {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  background: var(--color-done-fg);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.notice__text { flex: 1; min-width: 0; }
+.notice__link {
+  flex: none;
+  min-height: var(--tap-target);
+  padding: 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-done-fg);
+  font: 600 var(--text-sm) / 1 var(--font-sans);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.notice__close {
+  flex: none;
+  width: var(--tap-target);
+  height: var(--tap-target);
+  border: 0;
+  background: transparent;
+  color: var(--color-done-fg);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .list {
   display: flex;
   flex-direction: column;
@@ -322,6 +395,12 @@ onMounted(() => store.fetchAll());
 
   .tab {
     flex: none;
+  }
+  .notice {
+    flex-wrap: wrap;
+  }
+  .notice__text {
+    flex: 1 1 calc(100% - 100px);
   }
 }
 </style>

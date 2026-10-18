@@ -9,6 +9,6 @@ import { ShelfService } from './shelf.service';
   imports: [TypeOrmModule.forFeature([ShelfBook]), OpenLibraryModule],
   controllers: [ShelfController],
   providers: [ShelfService],
-  exports: [ShelfService]
+  exports: [ShelfService],
 })
 export class ShelfModule {}

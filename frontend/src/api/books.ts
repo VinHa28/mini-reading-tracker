@@ -1,5 +1,5 @@
 import { http } from "@/api/client";
-import type { BookSearchResponse } from "@/types/api";
+import type { BookDetail, BookSearchResponse } from "@/types/api";
 
 export async function searchBooks(
   q: string,
@@ -9,5 +9,10 @@ export async function searchBooks(
     params: { q, page },
   });
 
+  return data;
+}
+
+export async function getBook(workId: string): Promise<BookDetail> {
+  const { data } = await http.get<BookDetail>(`/books/${workId}`);
   return data;
 }

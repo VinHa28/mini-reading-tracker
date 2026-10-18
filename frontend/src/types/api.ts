@@ -19,6 +19,11 @@ export interface BookSearchResponse {
   pageSize: number;
 }
 
+export interface BookDetail extends BookSummary {
+  description: string | null;
+  subjects: string[];
+}
+
 export interface ShelfBook {
   id: number;
   workId: string;

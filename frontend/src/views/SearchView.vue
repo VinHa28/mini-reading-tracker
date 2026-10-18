@@ -7,8 +7,11 @@ import { ApiError } from "@/api/client";
 import BookCard from "@/components/BookCard.vue";
 import Pagination from "@/components/Pagination.vue";
 import type { BookSummary } from "@/types/api";
+import { useToastStore } from "@/stores/toast";
 
 const router = useRouter();
+
+const toast = useToastStore();
 
 // Từ khóa dùng để gợi ý sách khi mới vào trang (ô tìm vẫn để trống)
 const SUGGESTED_QUERY = "fantasy";
@@ -27,7 +30,7 @@ const searched = ref(false);
 
 // workId -> trạng thái nút thêm vừa thao tác ở trang này
 const addStates = reactive<Record<string, "adding" | "added">>({});
-const addError = ref<string | null>(null);
+// const addError = ref<string | null>(null);
 
 const pageCount = computed(() => Math.ceil(total.value / pageSize.value));
 
@@ -57,7 +60,7 @@ function submitSearch() {
   runSearch(1);
 }
 
-// Lần đầu vào trang: hiện sẵn sách gợi ý, không điền chữ vào ô tìm
+// Lần đầu vào trang: hiện sẵn sách gợi ý
 onMounted(() => {
   activeQuery.value = SUGGESTED_QUERY;
   isSuggestion.value = true;
@@ -70,17 +73,18 @@ function addStateOf(b: BookSummary): "idle" | "adding" | "added" {
 }
 
 async function handleAdd(b: BookSummary) {
-  addError.value = null;
   addStates[b.workId] = "adding";
   try {
     await addToShelf(b.workId);
     addStates[b.workId] = "added";
+    toast.success("Đã thêm vào tủ sách", b.title);
   } catch (e) {
     if (e instanceof ApiError && e.status === 409) {
       addStates[b.workId] = "added"; // đã có trong tủ rồi
+      toast.success("Sách đã có trong tủ", b.title);
     } else {
       delete addStates[b.workId];
-      addError.value = e instanceof ApiError ? e.message : "Không thêm được sách";
+      toast.error("Không thêm được sách", e instanceof ApiError ? e.message : undefined);
     }
   }
 }
@@ -98,7 +102,7 @@ function openBook(b: BookSummary) {
     <button type="submit" :disabled="loading">Tìm</button>
   </form>
 
-  <p v-if="addError" class="msg msg--error">{{ addError }}</p>
+  <!-- <p v-if="addError" class="msg msg--error">{{ addError }}</p> -->
 
   <p v-if="loading" class="msg">Đang tải...</p>
   <div v-else-if="error" class="msg msg--error">

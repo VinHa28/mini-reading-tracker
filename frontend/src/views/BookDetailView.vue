@@ -6,6 +6,9 @@ import BookCover from '@/components/BookCover.vue';
 import type { BookDetail } from '@/types/api';
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useToastStore } from '@/stores/toast'
+
+const toast = useToastStore();
 
 const props = defineProps<{ workId: string }>()
 const router = useRouter();
@@ -16,7 +19,7 @@ const error = ref<ApiError | null>(null);
 const adding = ref(false);
 const justAdded = ref(false);
 const expanded = ref(false);
-const addError = ref<string | null>(null);
+// const addError = ref<string | null>(null);
 
 // Sách có thể có cả trăm chủ đề: chỉ hiện 10 cái đầu
 const topSubjects = computed(() => book.value?.subjects.slice(0, 10) ?? []);
@@ -43,15 +46,16 @@ watch(() => props.workId, load, { immediate: true });
 async function handleAdd() {
   if (!book.value) return;
   adding.value = true;
-  addError.value = null;
   try {
     await addToShelf(book.value.workId);
     justAdded.value = true;
+    toast.success("Đã thêm vào tủ sách", book.value.title);
   } catch (e) {
     if (e instanceof ApiError && e.status === 409) {
       justAdded.value = true;
+      toast.success("Sách đã có trong tủ", book.value.title);
     } else {
-      addError.value = e instanceof ApiError ? e.message : "Không thêm được sách";
+      toast.error("Không thêm được sách", e instanceof ApiError ? e.message : undefined);
     }
   } finally {
     adding.value = false;
@@ -100,7 +104,7 @@ async function handleAdd() {
         </dl>
 
         <div class="actions">
-          <p v-if="addError" class="error">{{ addError }}</p>
+          <!-- <p v-if="addError" class="error">{{ addError }}</p> -->
           <button
             type="button"
             class="add"

@@ -1,5 +1,7 @@
-import { BadRequestException } from '@nestjs/common';
 import { ReadingStatus, ShelfBook } from './shelf-book.entity';
+
+// Lỗi nghiệp vụ, không phụ thuộc framework web. Service đổi nó thành HTTP 400.
+export class ShelfRuleError extends Error {}
 
 export interface ShelfUpdateInput {
   currentPage?: number | null;
@@ -22,7 +24,7 @@ export function applyUpdate(
     input.rating === undefined &&
     input.note === undefined
   ) {
-    throw new BadRequestException(
+    throw new ShelfRuleError(
       'Phải cung cấp ít nhất một trong các thông tin: currentPage, status, rating, note',
     );
   }
@@ -31,7 +33,7 @@ export function applyUpdate(
   const hasTotal = total !== null && total > 0;
 
   if (page !== undefined && hasTotal && page > total) {
-    throw new BadRequestException(
+    throw new ShelfRuleError(
       `currentPage không được vượt quá totalPage (${total})`,
     );
   }
@@ -42,7 +44,7 @@ export function applyUpdate(
     hasTotal &&
     page < total
   ) {
-    throw new BadRequestException(
+    throw new ShelfRuleError(
       `Không thể đặt trạng thái FINISHED khi currentPage (${page}) nhỏ hơn totalPage (${total})`,
     );
   }

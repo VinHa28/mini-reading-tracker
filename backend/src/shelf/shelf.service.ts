@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -9,7 +10,7 @@ import { In, QueryFailedError, Repository } from 'typeorm';
 import { OpenLibraryService } from '../open-library/open-library.service';
 import { AddToShelfDTO } from './dto/add-to-shelf.dto';
 import { UpdateShelfDTO } from './dto/update-shelf.dto';
-import { applyUpdate } from './shelf-rules';
+import { ShelfRuleError, applyUpdate } from './shelf-rules';
 
 @Injectable()
 export class ShelfService {
@@ -88,7 +89,14 @@ export class ShelfService {
 
   async update(id: number, dto: UpdateShelfDTO): Promise<ShelfBook> {
     const book = await this.findById(id);
-    applyUpdate(book, dto, new Date());
+    try {
+      applyUpdate(book, dto, new Date());
+    } catch (error) {
+      if (error instanceof ShelfRuleError) {
+        throw new BadRequestException(error.message);
+      }
+      throw error;
+    }
     return this.repo.save(book);
   }
 

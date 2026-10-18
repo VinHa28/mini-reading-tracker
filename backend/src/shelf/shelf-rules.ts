@@ -50,7 +50,8 @@ export function applyUpdate(
   // cho rating ở mọi trạng thái. null = xóa.
   if (input.rating !== undefined) book.rating = input.rating;
   // note đã được trim() ở DTO
-  if (input.note !== undefined) book.note = input.note === '' ? null : input.note;
+  if (input.note !== undefined)
+    book.note = input.note === '' ? null : input.note;
 
   if (status !== undefined && status !== book.status) {
     applyStatus(book, status, hasTotal ? total : null, now);

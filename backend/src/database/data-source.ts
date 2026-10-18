@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { DataSource } from "typeorm";
-import { ShelfBook } from "../shelf/shelf-book.entity";
+import { DataSource } from 'typeorm';
+import { ShelfBook } from '../shelf/shelf-book.entity';
 
 export default new DataSource({
   type: 'mysql',

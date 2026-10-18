@@ -67,7 +67,10 @@ async function handleAdd() {
 <template>
   <div class="page-detail">
     <button type="button" class="back" @click="router.back()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5M11 6l-6 6 6 6" />
+      </svg>
       Quay lại
     </button>
 
@@ -83,7 +86,7 @@ async function handleAdd() {
 
     <article v-else-if="book" class="detail">
       <div class="detail__cover">
-        <BookCover :src="book.coverUrl" :title="book.title" size="hero" />
+        <BookCover :src="book.coverUrl" :title="book.title" :author="book.authors.join(', ')" size="hero" />
       </div>
 
       <div class="detail__body">
@@ -105,12 +108,7 @@ async function handleAdd() {
 
         <div class="actions">
           <!-- <p v-if="addError" class="error">{{ addError }}</p> -->
-          <button
-            type="button"
-            class="add"
-            :disabled="book.inShelf || justAdded || adding"
-            @click="handleAdd"
-          >
+          <button type="button" class="add" :disabled="book.inShelf || justAdded || adding" @click="handleAdd">
             <template v-if="book.inShelf || justAdded">✓ Đã trong tủ sách</template>
             <template v-else-if="adding">Đang thêm...</template>
             <template v-else>+ Thêm vào tủ</template>
@@ -121,14 +119,13 @@ async function handleAdd() {
           <h2>Mô tả</h2>
           <template v-if="book.description">
             <p class="desc" :class="{ 'desc--clamp': !expanded }">{{ book.description }}</p>
-            <button
-              v-if="book.description.length > 280"
-              type="button"
-              class="more"
-              @click="expanded = !expanded"
-            >
+            <button v-if="book.description.length > 280" type="button" class="more" @click="expanded = !expanded">
               {{ expanded ? "Thu gọn" : "Xem thêm" }}
-              <svg class="more__icon" :class="{ 'more__icon--up': expanded }" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+              <svg class="more__icon" :class="{ 'more__icon--up': expanded }" width="16" height="16" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </button>
           </template>
           <p v-else class="desc desc--empty">Chưa có mô tả.</p>
@@ -160,9 +157,15 @@ async function handleAdd() {
   font: 600 var(--text-md) / 1 var(--font-sans);
   cursor: pointer;
 }
-.back:hover { background: var(--color-accent-soft); }
 
-.state-text { color: var(--color-text-muted); }
+.back:hover {
+  background: var(--color-accent-soft);
+}
+
+.state-text {
+  color: var(--color-text-muted);
+}
+
 .state {
   display: flex;
   flex-direction: column;
@@ -170,8 +173,17 @@ async function handleAdd() {
   gap: var(--space-2);
   padding: var(--space-6) 0;
 }
-.state p { margin: 0; color: var(--color-text-muted); }
-.link { color: var(--color-accent); font-weight: 600; }
+
+.state p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.link {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
 .btn {
   min-height: var(--tap-target);
   padding: 0 var(--space-5);
@@ -189,15 +201,18 @@ async function handleAdd() {
   gap: var(--space-7);
   align-items: flex-start;
 }
+
 .detail__cover {
   flex: 0 0 320px;
   max-width: 100%;
 }
+
 .detail__cover :deep(.cover) {
   width: 100%;
   border-radius: var(--radius);
   box-shadow: var(--shadow-md);
 }
+
 .detail__body {
   flex: 1 1 480px;
   min-width: 0;
@@ -206,9 +221,23 @@ async function handleAdd() {
   gap: 28px;
 }
 
-.head { display: flex; flex-direction: column; gap: var(--space-2); }
-.head h1 { font-size: var(--text-3xl); font-weight: 700; line-height: 1.25; }
-.authors { margin: 0; font-size: var(--text-lg); color: var(--color-text-muted); }
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.head h1 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.authors {
+  margin: 0;
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
 
 .facts {
   display: flex;
@@ -219,12 +248,36 @@ async function handleAdd() {
   border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
 }
-.facts div { display: flex; flex-direction: column; gap: 2px; }
-.facts dt { font-size: 13px; color: var(--color-text-muted); }
-.facts dd { margin: 0; font-size: var(--text-lg); font-weight: 600; }
 
-.actions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
-.error { margin: 0; color: var(--color-danger); }
+.facts div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.facts dt {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.facts dd {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger);
+}
+
 .add {
   display: inline-flex;
   align-items: center;
@@ -239,16 +292,35 @@ async function handleAdd() {
   font: 600 var(--text-base) / 1 var(--font-sans);
   cursor: pointer;
 }
-.add:hover:not(:disabled) { background: var(--color-accent-hover); }
+
+.add:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
 .add:disabled {
   background: var(--color-accent-soft);
   color: var(--color-accent);
   cursor: default;
 }
 
-.block { display: flex; flex-direction: column; gap: 10px; }
-.block h2 { font-size: var(--text-xl); font-weight: 600; }
-.desc { margin: 0; font-size: var(--text-base); line-height: 1.7; white-space: pre-line; }
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.block h2 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+.desc {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
 .desc--clamp {
   display: -webkit-box;
   -webkit-line-clamp: 4;
@@ -256,7 +328,12 @@ async function handleAdd() {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.desc--empty { color: var(--color-text-muted); font-style: italic; }
+
+.desc--empty {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
 .more {
   align-self: flex-start;
   display: inline-flex;
@@ -271,7 +348,10 @@ async function handleAdd() {
   font: 600 var(--text-md) / 1 var(--font-sans);
   cursor: pointer;
 }
-.more__icon--up { transform: rotate(180deg); }
+
+.more__icon--up {
+  transform: rotate(180deg);
+}
 
 .chips {
   display: flex;
@@ -281,6 +361,7 @@ async function handleAdd() {
   padding: 0;
   list-style: none;
 }
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -292,15 +373,50 @@ async function handleAdd() {
 }
 
 @media (max-width: 719px) {
-  .back { margin-bottom: var(--space-2); }
-  .detail { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 20px; }
-  .detail__cover { flex: none; display: flex; justify-content: center; }
-  .detail__cover :deep(.cover) { width: 200px; }
-  .detail__body { gap: var(--space-5); flex: none; }
-  .head { gap: 6px; }
-  .head h1 { font-size: var(--text-2xl); }
-  .authors { font-size: var(--text-base); }
-  .facts { gap: var(--space-5); }
-  .add { width: 100%; }
+  .back {
+    margin-bottom: var(--space-2);
+  }
+
+  .detail {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .detail__cover {
+    flex: none;
+    display: flex;
+    justify-content: center;
+  }
+
+  .detail__cover :deep(.cover) {
+    width: 200px;
+  }
+
+  .detail__body {
+    gap: var(--space-5);
+    flex: none;
+  }
+
+  .head {
+    gap: 6px;
+  }
+
+  .head h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .authors {
+    font-size: var(--text-base);
+  }
+
+  .facts {
+    gap: var(--space-5);
+  }
+
+  .add {
+    width: 100%;
+  }
 }
 </style>

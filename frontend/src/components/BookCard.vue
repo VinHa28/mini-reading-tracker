@@ -16,7 +16,7 @@ const emit = defineEmits<{
 <template>
     <article class="card">
         <button class="card__open" type="button" @click="emit('open')">
-            <BookCover :src="book.coverUrl" :title="book.title" size="card" />
+            <BookCover :src="book.coverUrl" :title="book.title" :author="book.authors.join(', ')" size="card" />
             <h3 class="card__title">{{ book.title }}</h3>
         </button>
         <p class="card__meta">

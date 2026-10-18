@@ -91,4 +91,11 @@ export class ShelfService {
     applyUpdate(book, dto, new Date());
     return this.repo.save(book);
   }
+
+  async remove(id: number): Promise<void> {
+    const result = await this.repo.delete({ id });
+    if (result.affected === 0) {
+      throw new NotFoundException('Không tìm thấy sách trong tủ.');
+    }
+  }
 }

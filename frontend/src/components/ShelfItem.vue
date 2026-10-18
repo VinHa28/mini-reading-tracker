@@ -83,7 +83,7 @@ function onStatusChange(e: Event) {
 <template>
     <article class="item">
         <RouterLink class="item__cover" :to="{ name: 'book-detail', params: { workId: entry.workId } }">
-            <BookCover :src="coverUrl" :title="entry.title" size="card" />
+            <BookCover :src="coverUrl" :title="entry.title" :author="entry.authors" size="card" />
         </RouterLink>
 
         <div class="item__body">
